@@ -24,7 +24,7 @@ class Game():
             return
         else:
             self.num_stones = self.num_stones-remove_count
-            current_max = max(self.current_max, remove_count)
+            self.current_max = max(self.current_max, remove_count)
             self.whos_turn = not self.whos_turn
 
 

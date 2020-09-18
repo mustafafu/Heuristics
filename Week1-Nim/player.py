@@ -44,6 +44,23 @@ class Player():
             return self.state_value[num_stones,current_max]
 
 
+    def compute_next_move(self,turn_num_stones,turn_current_max):
+        self.current_max = turn_current_max
+        self.num_stones = turn_num_stones
+        best_move = 1
+        best_value = -1
+        for i in range(1, self.current_max + 2):
+            remaining_stones = self.num_stones - i
+            if remaining_stones == 0:
+                best_move = i
+                return best_move
+            else:
+                if best_value <= self.get_value(remaining_stones, max(i, self.current_max)) :
+                    best_value = self.get_value(remaining_stones, max(i, self.current_max))
+                    best_move = i
+        return best_move
+
+
 
 
 #
