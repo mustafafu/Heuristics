@@ -26,7 +26,7 @@ class Player():
                 [self.num_stones + 1, self.sup_max_remove + 1, MAX_RESET + 1, MAX_RESET + 1, 2])  # stones,current_max
             state = [self.num_stones, BASE_MAX, 4, 4, 0]
             t0 = time.time()
-            best_action = player_1.get_best_action(state)
+            best_action = self.get_best_action(state)
             print('Elapsed time : {}'.format(time.time() - t0))
             np.save(save_string,self.state_value)
         else:
@@ -49,7 +49,7 @@ class Player():
         this_remaining_resets = state[2]
         is_reset_imposed = state[4]
         if is_reset_imposed:
-            range_end = min(remaining_stones, BASE_MAX) + 1
+            range_end = min(remaining_stones, 3) + 1
             possible_removing_counts = np.arange(1, range_end)
             reset_array = np.zeros(possible_removing_counts.shape)
             if this_remaining_resets == 0:

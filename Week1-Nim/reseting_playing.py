@@ -5,7 +5,7 @@ import numpy as np
 BASE_MAX = 2
 
 ## Setup for the play
-init_num_stones = np.random.randint(25,150)
+init_num_stones = 1000#np.random.randint(25,150)
 the_game = Game(init_num_stones,BASE_MAX)
 player_1 = Player('1',the_game.num_stones,the_game.current_max)
 player_2 = Player('2',the_game.num_stones,the_game.current_max)
