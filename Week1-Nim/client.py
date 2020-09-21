@@ -179,7 +179,7 @@ if __name__ == '__main__':
 
         else:
             num_stones = status["stones_left"]
-            current_max = status["current_max"]
+            current_max = max(2, status["current_max"])
             reset_imposed = status["reset"]
             my_resets = status["reset_left"]
             if reset_imposed:
