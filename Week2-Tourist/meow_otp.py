@@ -118,6 +118,8 @@ def compute_value_of_day(day_idx, list_of_sites, site_beginhours, site_endhours,
                 continue
             else:
                 feasible_list.append(int(site))
+                current_x = site_x
+                current_y = site_y
                 current_val += site_values[site_idx]
                 current_time = possible_leaving_time
     return current_val, feasible_list
