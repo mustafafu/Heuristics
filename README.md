@@ -1,6 +1,6 @@
 # Heuristics
 
-## Week-1
+## Week-1 : Expanding Nim Game
 Game can be found [here](https://cs.nyu.edu/courses/fall20/CSCI-GA.2965-001/expandingnim.html) in the course web site of Heursitics class taught by Prof. Shasha. Here is a description of the game copied from the course web site.
 ```
 You and your opponent are presented with some number of stones that I will announce the day of the competition. The winner removes the last stone(s). The first player can take up to three (1, 2, or 3). At any later point in play, call the maximum that any previous player has taken currentmax . Initially currentmax has the value 0. At any later turn, a player may take (i) 1, 2, or 3 if a reset has been imposed by the other player in the immediately preceding turn (ii) up to a maximum of 3 and 1 + currentmax, otherwise. Thus, a reset by player P affects P's opponent's following move, but does not change currentmax nor does it affect any move after that.
@@ -18,8 +18,8 @@ I started with a case no reset and no expansion, which we can look into the futu
 
 For the expansion I used a dynamic programming solution looking into two steps depth and trying to maximize the outcome after two states. 
 
-## Week-1
-Game can be found [here](https://cs.nyu.edu/courses/fall20/CSCI-GA.2965-001/tour.html) in the course web site of Heursitics class taught by Prof. Shasha. Here is a description of the game copied from the course web site.
+## Week-2 : Optimal Touring
+The problem can be found [here](https://cs.nyu.edu/courses/fall20/CSCI-GA.2965-001/tour.html) in the course web site of Heursitics class taught by Prof. Shasha. Here is a description of the game copied from the course web site.
 ```
 You want to visit up to n sites over k days. Each site has certain visiting hours. You have fixed a time you want to spend at each site which must all happen in one day. The time to go from site to site in minutes is the sum of street and avenue differences between them. On each day, you can start at any site you like (as if you teleported from the previous place you visited and slept on the street).
 
