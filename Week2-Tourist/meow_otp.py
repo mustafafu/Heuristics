@@ -7,8 +7,6 @@ import hungarian_algorithm as hng
 import sys
 import time
 
-
-
 # This functions shows how to read the data from stdin using the specified
 # format, but it does not save any useful information other than the number
 # of sites and the number of days. The data should be saved are marked
