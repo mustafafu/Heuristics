@@ -24,7 +24,7 @@ def read_all():
     # for line in sys.stdin:
 
     # Using readlines()
-    file1 = open('touringtest.txt', 'r')
+    file1 = open('touringtest2.txt', 'r')
     Lines = file1.readlines()
     for line in Lines:
         ln = line.split()
@@ -112,12 +112,16 @@ def compute_value_of_day(day_idx, list_of_sites, site_beginhours, site_endhours,
         else:
             travel_time = abs(current_x - site_x) + abs(current_y - site_y)
             visit_time = site_required_time[site_idx]
-            possible_leaving_time = current_time + travel_time + visit_time
+            possible_leaving_time = max(current_time + travel_time, site_beginhours[day_idx][site_idx] * 60) + visit_time
+            # print(possible_leaving_time)
             if possible_leaving_time > site_endhours[day_idx][site_idx] * 60:
                 # print('Insufficient time to visit site {}'.format(site_idx))
                 continue
+            elif (current_time + travel_time) < (site_beginhours[day_idx][site_idx] * 60):
+                continue
             else:
                 feasible_list.append(int(site))
+                # print('Site {}, BeginHours {}, Endhour {}, Arrive {}, Leave {}'.format(site,site_beginhours[day_idx][site_idx],site_endhours[day_idx][site_idx],max(current_time + travel_time, site_beginhours[day_idx][site_idx]*60),max(current_time + travel_time, site_beginhours[day_idx][site_idx])+ visit_time ))
                 current_x = site_x
                 current_y = site_y
                 current_val += site_values[site_idx]
