@@ -10,10 +10,12 @@ initial_weight = 3
 iw_pos = -4
 
 
-# just and helper function
+# just a helper function
 def pos2arr(pos):
     return pos + 30
 
+def arr2pos(arr):
+    return arr-30
 
 # INITIALIZE
 myWeight = np.zeros(k_max)
