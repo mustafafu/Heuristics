@@ -1,3 +1,7 @@
+# Echo client program
+import socket
+import sys
+import random
 import numpy as np
 import time
 import threading
@@ -5,17 +9,16 @@ import multiprocessing
 from multiprocessing import Pool, TimeoutError
 
 
+def convert_board(board):
+    board_len = len(board)
+    converted_board = np.zeros([len(board),2],dtype='int')
+    converted_board[:,0] = np.arange(0, board_len)
+    converted_board[:,1] = np.array([_ for _ in board])
+    return converted_board
+
+
 def get_cm(board, board_weight, board_cm_pos):
     return (np.sum(board[:, 0] * board[:, 1]) + board_cm_pos * board_weight) / (np.sum(board[:, 1]) + board_weight)
-
-
-def get_feasible_remove_actions(board,board_weight,ls_loc,rs_loc,board_cm_pos):
-    current_weight_idxs = np.where(board[:, 1] > 0)[0]
-    current_weights = board[current_weight_idxs, 1]
-    total_weight = np.sum(current_weights) + board_weight
-    next_cm = (get_cm(board, board_weight, board_cm_pos) * total_weight - current_weights*board[current_weight_idxs,0]) / (total_weight - current_weights)
-    feasible_actions = current_weight_idxs[np.where(np.logical_and(next_cm >= ls_loc, next_cm <= rs_loc))[0]]
-    return board[feasible_actions, :]
 
 
 def get_addition_action(this_board, my_weights_set, board_weight, ls_loc, rs_loc, board_cm_pos):
@@ -30,6 +33,15 @@ def get_addition_action(this_board, my_weights_set, board_weight, ls_loc, rs_loc
             return [feasible_positions[-1],weight]
     print('could not find a feasible placement')
     return [available_positions[-1],my_weights[0]]
+
+
+def get_feasible_remove_actions(board,board_weight,ls_loc,rs_loc,board_cm_pos):
+    current_weight_idxs = np.where(board[:, 1] > 0)[0]
+    current_weights = board[current_weight_idxs, 1]
+    total_weight = np.sum(current_weights) + board_weight
+    next_cm = (get_cm(board, board_weight, board_cm_pos) * total_weight - current_weights*board[current_weight_idxs,0]) / (total_weight - current_weights)
+    feasible_actions = current_weight_idxs[np.where(np.logical_and(next_cm >= ls_loc, next_cm <= rs_loc))[0]]
+    return board[feasible_actions, :]
 
 
 def double_depth_minmax(board,depth,board_weight, ls_loc, rs_loc, board_cm_pos):
@@ -86,8 +98,11 @@ def double_depth_minmax(board,depth,board_weight, ls_loc, rs_loc, board_cm_pos):
 def threadder(board,depth,board_weight, ls_loc, rs_loc, board_cm_pos):
     t0 = time.time()
     value, action = double_depth_minmax(board,depth,board_weight, ls_loc, rs_loc, board_cm_pos)
-    print("Depth {} assigned to thread: {}, play action {} after {} seconds".format(depth, threading.current_thread().name,action,time.time()-t0))
+    # print("Depth {} assigned to thread: {}, play action {} after {} seconds".format(depth, threading.current_thread().name,action,time.time()-t0))
     return action
+
+
+
 
 def threaded_move_compute(board,default_compute_times,board_weight, ls_loc, rs_loc, board_cm_pos):
     num_cpu = multiprocessing.cpu_count()
@@ -99,7 +114,7 @@ def threaded_move_compute(board,default_compute_times,board_weight, ls_loc, rs_l
     last_action_time = 0
     while (time.time()-t0) < default_compute_times[remaining_weights]:
         t_move_init = time.time()
-        result.append(p.apply_async(threadder, (board.copy(), init_depth, board_weight, ls_loc, rs_loc, board_cm_pos) ))
+        result.append(p.apply_async(threadder, (board.copy(), init_depth, board_weight, ls_loc, rs_loc, board_cm_pos)))
         init_depth += 2
         try:
             best_action = [res.get(timeout=default_compute_times[remaining_weights]-(time.time()-t0)) for res in result]
@@ -108,115 +123,112 @@ def threaded_move_compute(board,default_compute_times,board_weight, ls_loc, rs_l
             #     print('breaking for last action time')
             #     break
             last_action_time = move_time
-            if move_time > 1.5:
+            if move_time > 2.1:
                 break
-            if init_depth-2 >= np.sum(board[:,1]>0):
+            if init_depth-2 >= np.sum(board[:,1] > 0):
+                break
+            if (time.time()-t0) > (default_compute_times[remaining_weights]-(time.time()-t0)):
                 break
         except TimeoutError:
             # print('Did not finish the process')
             p.terminate()
-    print('Remaining weight count was {}, longest move compute took {}, total compute took {}'.format(remaining_weights,move_time,time.time()-t0))
+    # print('Remaining weight count was {}, longest move compute took {}, total compute took {}'.format(remaining_weights,move_time,time.time()-t0))
     return best_action[-1]
 
 
 
 
-# def call_threadder(board, remaining_time, board_weight, ls_loc, rs_loc, board_cm_pos):
-#     t0 = time.time()
-#     # some rough timers
-#     move_durations = np.ones([49])
-#     move_durations[0:13] = 5
-#     move_durations[13:18] = 22
-#     move_durations[18:22] = 6
-#     move_durations[22:23] = 12
-#     move_durations[23:30] = 16
-#     move_durations[30:] = 0.1
-#
-#     remaining_weights = np.sum(useful_board[:, 1] > 0) - 1
-#     apprx_total_times = np.sum(move_durations[remaining_weights::-2])
-#     this_allowed_time = move_durations[remaining_weights] * remaining_time / apprx_total_times
-#     #get the cpu count
-#     num_cpu = multiprocessing.cpu_count()
-#     p = Pool(num_cpu)
-#     init_depth = 0
-#     max_depth = 9
-#     result = []
-#     for depth in range(init_depth,max_depth+1,2):
-#         result.append(p.apply_async(threadder, (board.copy(), int(depth), board_weight, ls_loc, rs_loc, board_cm_pos)))
-#     try:
-#         best_action = [res.get(timeout=this_allowed_time) for res in result]
-#         print(best_action)
-#     except TimeoutError:
-#         p.terminate()
-#     print('Remaining weight count was {}, total compute took {}'.format(remaining_weights,time.time()-t0))
-#     return best_action[-1]
+HOST = sys.argv[1].split(":")[0]
+PORT = int(sys.argv[1].split(":")[1])              # The same port as used by the server
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((HOST, PORT))
+
+first = 0
+name = "meow-2"
+
+for idx, val in enumerate(sys.argv):
+    if(val == "-f"):
+        first = 1
+    if(val == "-n"):
+        name = sys.argv[idx + 1]
+string_to_send = '{} {}'.format(name, first)
+# print(string_to_send)
+s.sendall(string_to_send.encode())
 
 
-def main():
-    k_max = 25
-    board_negat = -30
-    board_posit = 30
-    board_weight = 3
-    board_cm_pos = 0 - board_negat
-    board_len = abs(board_negat) + abs(board_posit) + 1
-    board = np.zeros([board_len, 2], dtype='int')
-    board[:, 0] = np.arange(0, board_len)
-    ls_loc = -3 - board_negat
-    rs_loc = -1 - board_negat
-    initial_weight = 3
-    iw_pos = -4 - board_negat
-    board[iw_pos, 1] = initial_weight
-    print(np.sum(board[:, 1] > 0))
+this_k = int(s.recv(1024))
+# print("Number of Weights is: " + str(this_k))
+my_weights_set = set(np.arange(1, this_k+1))
+opponent_weight_set = set(np.arange(1, this_k+1))
+
+board_negat = -30
+board_posit = 30
+board_weight = 3
+board_cm_pos = 0 - board_negat
+board_len = abs(board_negat) + abs(board_posit) + 1
+board = np.zeros([board_len, 2], dtype='int')
+board[:, 0] = np.arange(0, board_len)
+ls_loc = -3 - board_negat
+rs_loc = -1 - board_negat
+
+# move_durations = np.ones([49])
+# move_durations[0:13] = 5
+# move_durations[13:18] = 22
+# move_durations[18:22] = 6
+# move_durations[22:23] = 12
+# move_durations[23:30] = 16
+# move_durations[30:] = 0.1
+move_durations = np.ones([49])
+move_durations[0:11] = 1
+move_durations[12:19] = 30
+move_durations[19:21] = 20
+move_durations[21:23] = 10
+move_durations[23:] = 0.1
+# move_durations[0:]=60
+
+used_time = 0
+
+while(1):
+    t0 = time.time()
+    data = s.recv(1024)
+    while not data:
+        continue
+    data = data.decode('utf8')
+    data = [int(data.split(' ')[i]) for i in range(0, 63)]
+    board = data[1:-1]
+
+    if data[62] == 1:
+        break
+
+    useful_board = convert_board(board)
 
 
-    print(get_cm(board,board_weight,board_cm_pos))
-
-    this_k = 25
-    my_weights_set = set(np.arange(1,this_k))
-    opponent_weight_set = set(np.arange(1,this_k))
-
-    while True:
-        placement = get_addition_action(board, my_weights_set, board_weight, ls_loc, rs_loc, board_cm_pos)
-        print(placement)
-        board[placement[0], 1] = placement[1]
+    if data[0] == 0:
+        # print(board)
+        # print(useful_board)
+        # time.sleep(10)
+        placement = get_addition_action(useful_board, my_weights_set, board_weight, ls_loc, rs_loc, board_cm_pos)
         my_weights_set.remove(placement[1])
-        print(get_cm(board, board_weight, board_cm_pos))
-        placement = get_addition_action(board, opponent_weight_set, board_weight, ls_loc, rs_loc, board_cm_pos)
-        print(placement)
-        board[placement[0], 1] = placement[1]
-        opponent_weight_set.remove(placement[1])
-        print(get_cm(board, board_weight, board_cm_pos))
+        weight = placement[1]
+        position = placement[0] + board_negat
+        choice = [weight,position]
+        # print('I put action {}, and send data {}'.format(placement,choice))
+        string_to_send = '{} {}'.format(weight, position)
+        s.sendall(string_to_send.encode())
+        used_time += (time.time() - t0)
+    else:
+        remaining_time = 120 - used_time
+        if remaining_time < 1:
+            number_weights = np.sum(useful_board[:,1]>0)
+            move_durations[number_weights::-1] = (1 / number_weights + 1 )
+        action = threaded_move_compute(useful_board, move_durations, board_weight, ls_loc, rs_loc, board_cm_pos)
+        # action = call_threadder(useful_board, remaining_time, board_weight, ls_loc, rs_loc, board_cm_pos)
+        position = action[0] + board_negat
+        choice = position
+        # print("Removed:" + str(choice))
+        string_to_send = '{}'.format(choice)
+        s.sendall(string_to_send.encode())
+        used_time += (time.time() - t0)
 
-        if len(my_weights_set) == 0:
-            break
+s.close()
 
-
-    player = False
-
-    while True:
-        player = not player
-        t0 = time.time()
-        move_durations = np.ones([49])
-        move_durations[0:13] = 5
-        move_durations[13:18] = 22
-        move_durations[18:22] = 6
-        move_durations[22:23] = 12
-        move_durations[23:30] = 16
-        move_durations[30:] = 0.1
-        if player:
-            action = threaded_move_compute(board, move_durations,board_weight, ls_loc, rs_loc, board_cm_pos)
-            board[action[0], 1] = 0
-        else:
-            action = threaded_move_compute(board, move_durations, board_weight, ls_loc, rs_loc, board_cm_pos)
-            board[action[0], 1] = 0
-
-        if get_cm(board, board_weight, board_cm_pos) < ls_loc or get_cm(board, board_weight, board_cm_pos) > rs_loc:
-            print('Player {} lost'.format(player))
-            break
-
-
-
-
-
-if __name__ == '__main__':
-    main()
