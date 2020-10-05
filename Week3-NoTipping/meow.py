@@ -1,10 +1,8 @@
 # Echo client program
 import socket
 import sys
-import random
 import numpy as np
 import time
-import threading
 import multiprocessing
 from multiprocessing import Pool, TimeoutError
 
