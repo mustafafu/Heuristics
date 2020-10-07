@@ -85,6 +85,8 @@ def double_depth_minmax(board,depth,board_weight, ls_loc, rs_loc, board_cm_pos):
             if value < worst_value:
                 worst_value = value
             board[opponent_action[0], 1] = opponent_action[1]
+            if worst_value < -1:
+                break
         A_value[ii] = worst_value
         board[action[0], 1] = action[1]
         if A_value[ii] > 1:
