@@ -71,3 +71,55 @@ First step, building up the board, in other words, placing the weights on the bo
 Second step, is to use a tree search (minmax) but with a shallow depth. Otherwise it will take too long to run. Here it ry to have the board cm as far right as possible in order to survive until the rounds that i can actually compute the entire playout.
 
 Third step, i am using the entire game future states to have a playing strategy, if i can force a win with any of my actions i use that action otherwise try to move a state that can force a win in the future.
+
+
+
+
+
+## Week-4 : Ambulance Pick up
+
+The problem can be found [here](https://cs.nyu.edu/courses/fall20/CSCI-GA.2965-001/ambulance.html) in the course web site of Heursitics class taught by Prof. Shasha. Here is a description of the game copied from the course web site.
+```
+The ambulance planning real-time problem is to rescue as many people as possible following a disaster. The problem statement identifies the locations of people and the time they have to live. You can also establish mobile hospitals at the beginning of the problem. The problem is to get as many people to the hospitals on time as possible.
+
+In our case, the graph is the Manhattan grid with every street going both ways. It takes a minute to go one block either north-south or east-west. Each hospital has an (x,y) location that you can determine when you see the distribution of victims. The ambulances need not return to the hospital where they begin. Each ambulance can carry up to four people. It takes one minute to load a person and one minute to unload up to four people. Each person will have a rescue time which is the number of minutes from now when the person should be unloaded in the hospital to survive. By the way, this problem is very similar to the vehicle routing problem about which there is an enormous literature and nice code like "jsprit" which was used in 2015 to great effect. If anyone wants to take a break from programming, he/she may volunteer to look up that literature and propose some good heuristics.
+
+So the data will be in the form:
+person(xloc, yloc, rescuetime)
+
+```
+
+First step, clustering the patients and deploying hospitals to the centers without assigning num ambulances yet.
+
+Second step, building up the possible up to quadruple of patients, which are feasible to rescue at one turn. (H-P1-H, H-P1-P2,H ... )
+
+Third step, we have max ambulance set, which is the largest number of ambulance in the given scenario for any hospital. Using this number, create routes for every hospital as if each hospital has this max number of ambulances.
+  * Two methods, one forward and one backward.
+
+Fourth step, match the ambulance numbers such that remove some ambulance routes from every hospital. Find the maximum matching.
+
+
+
+
+
+
+## Week-5 : Random Lawn Mower
+The problem can be found [here](https://cs.nyu.edu/courses/fall20/CSCI-GA.2965-001/randomower.html) in the course web site of Heursitics class taught by Prof. Shasha. Here is a description of the game copied from the course web site.
+```
+There is one perfectly flexible but unbreakable rope attached to two posts on a large but unkepmt lawn. The posts are a distance 1000 meters apart and the rope is of length 1100 meters. So there is some slack in the rope.
+
+A randomower is a driverless lawnmower that can change directions at any time by an arbitrary angle. Fortunately, it can be clipped to the rope so it won't wander off too far. You are trying to use this random lawnmower to cut at least part of the grass between the posts. We'll call the rope's zero point is at post A and its end point at post B is r. The distance between A and B is d where d < r.
+
+To train your intuition, suppose you wanted to cut the grass to clear a path, i.e. a line segment the width of the lawnmower itself, between the two posts. It's ok if more grass is cut on the sides in addition, but you want to be sure to have a continuous path. The challenge is to do this with the minimum number of attachments.
+
+Warm-up: What is the smallest number of attachments necessary to mow a straight line segment (and, optionally, other grass) from post to post?
+
+Solution: Call the difference r - d, diff. Attach the randomower to the diff meter mark along the rope starting say from post A. Because the rope is diff meters longer than the distance between the posts, the distance along the rope between the attachment point of the randomower and post B is d. Therefore, the randomower can reach post A up to a point diff from point A in the direction of B. Next attach the randomower at the 2*diff meter mark along the rope from post A. So, all together we will need ceiling(d/diff) attachments.
+
+Because of its random movements, the randomower will mow more grass than what is in the line segment. That suggests a game.
+
+Suppose that T1 and T2 play a game in which each wants to use attachments that cuts as much of the lawn as possible. They take turns as follows: T2 makes the first attachment. Then T1 makes two. Then T2 makes two. This goes on until each makes the same number of moves (T2, in the last move, makes one attachment). Each player gets credit for every part of the lawn that is first mowed by randomower due to an attachment by that player.
+
+```
+
+For each time when pick a pair of attachment, I search entire space with 10 step-size, so 110^3 possibility. I check the values as first + second - third attachment. As the next player will be doing the third attachment. I pick max-min to get the best move among what I explored. 
