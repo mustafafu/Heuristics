@@ -340,9 +340,9 @@ def ambulance_match_eval(ambulance_values,ambulance_match):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input', type=str, default='data4',
+    parser.add_argument('--input', type=str, default='data50',
                         help='What is the data file (string)?')
-    parser.add_argument('--output', type=str, default='out4',
+    parser.add_argument('--output', type=str, default='out50',
                         help='What is the output file (string)?')
     args = parser.parse_args()
     return args
@@ -373,6 +373,16 @@ if __name__ == '__main__':
         kmedoids = KMedoids(n_clusters=num_hospitals, metric='manhattan').fit(patients[:, :2])
         hospital_locations = np.round(kmedoids.cluster_centers_).astype('int')
         hospitals[:, :2] = hospital_locations
+        # hospitals[:,:2] = np.array([[38,63],
+        #                    [65,53],
+        #                    [50,42],
+        #                    [38,51],
+        #                    [48,53]])
+        # # 38, 63, 3
+        # # 65, 53, 5
+        # # 50, 42, 8
+        # # 38, 51, 8
+        # # 48, 53, 4
     else:
         hospital_locations = hospitals[:, :2]
 
@@ -391,8 +401,9 @@ if __name__ == '__main__':
 
     for hospital_idx in range(num_hospitals):
         this_patients = np.where(patient_hospital_match==hospital_idx)[0]
+        # print(np.sum(patient_hospital_match==hospital_idx))
         sorted_distance_args = np.argsort(patient_hospital_distance[this_patients,hospital_idx])
-        patients_to_remove = this_patients[sorted_distance_args][65:]
+        patients_to_remove = this_patients[sorted_distance_args][75:]
         patient_hospital_match[patients_to_remove] = num_hospitals + 1
         # print(np.sum(patient_hospital_match==hospital_idx))
 
@@ -429,9 +440,10 @@ if __name__ == '__main__':
                 best_permutation = permutation
 
 
+
     fin = open(output_file, "at")
 
-
+    # best_permutation = np.arange(num_hospitals)
     tmp_hospitals = hospitals.copy()
     tmp_hospitals = tmp_hospitals[np.argsort(best_permutation)]
     hospitals[:,:2] = tmp_hospitals[:,:2]
@@ -444,7 +456,7 @@ if __name__ == '__main__':
 
     # print('\n')
     fin.write('\n')
-
+    score = 0
     for h_idx,hospital in enumerate(hospitals):
         number_of_ambulance = hospital[2]
         hospital_routing = hospital_routings[np.argsort(best_permutation)[h_idx]]
@@ -462,6 +474,7 @@ if __name__ == '__main__':
             this_route = this_hospital_routes[sorted_route_idx][0]
             my_string = 'Ambulance: {}: ({},{})'.format(h_idx + 1, hospital[0],hospital[1])
             for patient in this_route[1:-1]:
+                score +=1
                 my_string = my_string + ', {}: ({},{},{})'.format(patient + 1, patients[patient, 0],patients[patient, 1], patients[patient, 2])
             my_string = my_string + ', {}: ({},{})'.format(h_idx + 1, hospital[0],hospital[1])
             # print(my_string)
@@ -469,7 +482,7 @@ if __name__ == '__main__':
 
     fin.close()
 
-
+    print(score)
 
 
 
