@@ -82,12 +82,14 @@ def threshold_explore(prior, d, rope, cutoff_threshold):
     best_idx = int(np.argmax(total_value))
     # print('Moves:{}-{}, Best_Value:{}'.format(moves[best_idx][0], moves[best_idx][1], total_value[best_idx]))
     # print('Pool took {} seconds'.format(time.time() - t0))
+    p.close()
     return moves[best_idx][0], moves[best_idx][1]
 
 
 def search_neighborhood(a1, a2, prior, rope, d):
     num_cpu = multiprocessing.cpu_count()
     p = Pool(num_cpu)
+    p.close()
     # t0 = time.time()
     attachment_1 = np.arange(np.max([a1 - 10, 0]), np.min([a1 + 11, 1100]), dtype='int16')
     attachment_2 = np.arange(np.max([a2 - 10, 0]), np.min([a2 + 11, 1100]), dtype='int16')
@@ -126,7 +128,7 @@ def last_move(prior, d, rope):
     # t0 = time.time()
     min_val = round_10(np.min(prior)) if len(prior) > 0 else 550
     max_val = round_10(np.max(prior)) if len(prior) > 0 else 550
-    attachment_1 = np.arange(np.max([min_val - 100, 0]), np.min([max_val + 110, 1100]), 0.1)
+    attachment_1 = np.arange(np.max([min_val - 100, 0]), np.min([max_val + 110, 1100]), 1)
     results = []
     all_gains = []
     for a1 in attachment_1:
@@ -134,6 +136,7 @@ def last_move(prior, d, rope):
     for i, a1 in enumerate(attachment_1):
         all_gains.append(results[i].get())
     best_idx = int(np.argmax(all_gains))
+    p.close()
     return attachment_1[best_idx]
 
 def play(d, rope, attachments_per_player, site, name, cutoff_threshold, isFirst):
