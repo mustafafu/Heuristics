@@ -220,9 +220,13 @@ First the pixels adjacent to both the hunter and the one being hit are considere
 
 
 Prey:
+
 	Try to go to the center of the convex hull enclosing you, while avoiding hunter. If hunter is close by move perpendicular to hunters approach direction.
+
 Hunter:
+
 	if in the next move hunter will align with prey in horizontal, vertical, diagonal, or c-diagonal, then build the corresponding wall in this move.
+	
 	if the number of lines are close to limit, 
 		check after bouncing a wall
 			can you move this wall further inside, If yes remove this wall and wait until the alignment happens.
