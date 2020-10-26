@@ -1,0 +1,17 @@
+Evasion Game:
+
+Prey:
+	Try to go to the center of the convex hull enclosing you, while avoiding hunter. If hunter is close by move perpendicular to hunters approach direction.
+Hunter:
+	if in the next move hunter will align with prey in horizontal, vertical, diagonal, or c-diagonal, then build the corresponding wall in this move.
+	if the number of lines are close to limit, 
+		check after bouncing a wall
+			can you move this wall further inside, If yes remove this wall and wait until the alignment happens.
+		if not bounced but still need to remove a wall,
+			Find the lines limiting the prey's space, remove the rest.
+
+	Check all the rounds if stuck between two diagonal walls
+		if yes, remove them.
+
+	Check every round if prey and hunter are in the same constrained space:
+		if there is a line dividing the space, remove that line.

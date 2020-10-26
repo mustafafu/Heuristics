@@ -764,13 +764,13 @@ while True:
                     wall = "4"
                     just_removed = -1
 
-            if wall == "0":
-                willBuild = 0
-            else:
-                willBuild = 1
+            # if wall == "0":
+            #     willBuild = 0
+            # else:
+            #     willBuild = 1
 
 
-            if current_wall_count + willBuild >= max_wall:
+            if current_wall_count  >= max_wall:
                 if hv_x > 0 and prev_vx < 0 and prev_vy == hv_y and prey_x > hunter_x + 2*wall_timer + 2:
                     wall_to_left = find_wall_to_left(parsed_walls, hunter_x, hunter_y)
                     wtr = str(wall_to_left)
