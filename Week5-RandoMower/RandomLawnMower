@@ -1,0 +1,15 @@
+Random LawnMower
+
+First Move:
+	Play 500, --> My move has a value v1, opponent will play two moves back to back let's say v2 and v3. 
+				Searching the move space in stepsize of 10 and looking all the  v1-v2-v3 and maximizing the minimum over v2 and v3,
+				attaching to 500 or 600 is the best approach.
+
+Other Moves:
+	I have two play and I look into future of opponent's one play.
+	my plays have values v1 and v2
+	opponent's play have v3
+	I try to play the move that has largest v1+v2-v3 while v3 is maximized by opponent.
+
+Last Move:
+	Brute search with stepsize 0.1.
