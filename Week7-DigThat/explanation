@@ -1,0 +1,61 @@
+DETECTOR
+=====================================================
+
+Fill the grid with this diamond pattern,
+which allows fully discovering the grid with a little less than half the grid size.
+
++---+---O---+---+
+|   |   |   |   |
++---O---+---O---+
+|   |   |   |   |
+O---+---+---+---O
+|   |   |   |   |
++---O---+---O---+
+|   |   |   |   |
++---+---O---+---+
+
+
+CASE : Even number of entry or exits on all the neighbors of the center.
+Do nothing
+
++---+---O---+---+
+|   |   |   |   |
++---O---+---O---+
+|   |   |   ‖   |
+O---+---+---+===O
+|   |   |   |   |
++---O---+===O---+
+|   |   ‖   |   |
++---+---O---+---+
+
+
+
+CASE : Odd number of entry or exits on all the neighbors of the center. 
+Connect those neighbors through the center.
+
++---+---O---+---+
+|   |   |   |   |
++---O---+---O---+
+|   ‖   |   ‖   |
+O---+---+---+---O
+|   |   |   |   |
++---O---+===O---+
+|   |   ‖   |   |
++---+---O---+---+
+
+
+TUNNELER
+=====================================================
+
+Start from (1,2) and create the path ['U'] * num_grid - 1.
+
+UUUUUUUUUUUU
+
+while tunnel length is larger than this.
+Randomly pick two neighboor U-U.
+Place 'L' or 'R' randomly. (15% Left, 85% Right)
+
+If still tunnel length remaining to be used:
+	To throw out some algorithms that doesnt explore the finish and start horizantals,
+	Put a left tunnel piece to the start so add edge <1,1 - 1,2>
+	Put a left tunnel piece to the end so add edge <n,f-1 - n,f>
