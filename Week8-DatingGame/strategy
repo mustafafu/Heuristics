@@ -1,0 +1,17 @@
+Dating Game Strategy:
+
+Person:
+Start with randomm weights.
+As the matchmaker guess a correct positive feature, reduce the weight of that feature.
+Distribute  the change to all positive weights.
+
+
+Matchmaker:
+First Guess: the best performing initial random candidates. (Just to get the best score saved for the first time...)
+Next Guess:
+Gradient descent on the sammples from 20 to current guess.
+Next candidate <- updated weights
+If next candidate  ==  previous candidate:
+	Generate 10_000 random candidates which maximizes the covarience of the data matrix. (To explore more)
+	
+
